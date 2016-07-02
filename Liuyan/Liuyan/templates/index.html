@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
+	<title> 二中加油 </title>
+	<script type="text/javascript" src="../static/js/jquery-2.1.4.min.js"></script>
+	<style type="text/css">
+	body {
+		background-color: #CCCCCC;
+		margin: 0px;
+	}
+    a {
+        text-decoration: none;
+    }
+
+	.commdiv, .liuyan, .qrcode {
+		background-color: #FFFFFF;
+		font-family: 'Microsoft YaHei';
+	}
+	input, textarea {
+    	box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    	transition: border linear 0.2s, box-shadow linear 0.2s;
+	}
+	input, textarea, select {
+	    font-size: 1em;
+	    display: inline-block;
+	    padding: 4px;
+	    color: #555555;
+	    vertical-align: middle;
+	    background-color: #ffffff;
+	    border: 1px solid #cccccc;
+	    border-radius: 3px;
+	    margin: 3px 0;
+	}
+	input:focus,
+	textarea:focus {
+	    border-color: rgba(82, 168, 236, 0.8);
+	    outline: 0;
+	    outline: thin dotted \9;    /* IE6-9 */  
+	    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(82, 168, 236, 0.6);
+	}
+	button, #back_t{
+		color: #fff;
+    	text-shadow: 0 -1px 0 rgba(0,0,0,0.25);
+    	background-image: linear-gradient(to bottom,#ee5f5b,#bd362f);
+    	background-color: #da4f49;
+    	display: inline-block;
+	    padding: 6px 15px;
+	    margin-bottom: 0;
+	    font-size: 20px;
+	    line-height: 20px;
+	    vertical-align: middle;
+    	cursor: pointer;
+    	border: 0px solid #ccc;
+    	border-radius: 4px;
+	}
+	
+	</style>
+	<script type="text/javascript">
+	$(document).ready(function(){
+		$("#submit").click(function(){
+			var name=$("#name").val()
+			var comm=$("#comment").val()
+			var tel =$("#tel").val()
+			//alert(name+":"+comm+tel+comm.length)
+			if(name=="") {alert("名字不能为空"); return;}
+			if(comm.length < 5) {alert("寄语不能少于5个字"); return;}
+            if(tel.length<10 || tel.length>15) {alert("请输入正确的手机号"); return;}
+			$.post("/cheer/", {"name": name, "comm": comm, "tel": tel}, function(result){
+			    //$("#comment").val("")
+			    //$("#name").val("")
+			    //$("#tel").val("")
+			    
+                document.write(name+comm+tel+result);
+                window.location.reload();
+			});
+		});/*
+		$(".like").click(function(){
+			var cid = $(this).attr("cid");
+		    $(this).removeClass("like");	
+            $.post("/like/", {"cid": cid}, function(result){
+				num = $("#b"+cid).html()
+				$("#b"+cid).html(parseInt(num)+1)
+                $("#i"+cid).attr("src", "../static/img/black.png")
+                //alert(result);
+			});
+		});*/
+        $("#hint").fadeIn("slow");
+        setTimeout(function(){$("#hint").fadeOut("slow");},2000);
+	})
+
+    function onClick(cid) {
+        $.post("/like/", {"cid": cid}, function(result) {
+            num = $("#b"+cid).html()
+            $("#b"+cid).html(parseInt(num)+1)
+            $("#i"+cid).attr("src", "../static/img/black.png")
+            $("#a"+cid).attr("href", "javascript:void(0)") 
+        })
+    
+	}	
+		
+	</script>
+</head>
+<body>
+<p id="hint" style="width: 100%; text-align: center; font-size: 8px">（如果微信屏蔽了输入按钮，可以右上角通过浏览器取得更好体验）</p>
+<div id="cover" style="margin: 0px auto; visibility: visible;">
+	<img style="width: 100%;" src="../static/img/cover.jpg" />
+</div>
+
+<div class="commdiv" style="margin: 1px auto; padding:5px; visibility: visible;">
+	<div id="user" align="right" style="width: 95%; margin: 5px auto;">
+		<h3 style="display: inline-block; margin:5px auto;">我是</h3>
+		<h2 style="display: inline-block; color: red; margin:5px auto; font-family: 'SimSun';">义忠仁</h2>
+		<input id="name" name="name" style="display: inline-block; width: 100px; vertical-align:bottom;" placeholder="您的大名" />
+	</div>
+	<div id="teldiv" align="right" style="width: 95%; margin: 5px auto;">
+		<h3 style="display: inline-block; margin:5px auto; font-size: 15px;">您的手机</h3>
+		<input id="tel" name="tel" style="display: inline-block; width: 165px; height=20px; vertical-align:bottom; font-size: 10px;" placeholder="点赞前三将获文化衫＋明信片一份哦！" />
+	</div>
+	<textarea id="comment" name="comment" rows="4" placeholder="请留下高考寄语！(5-800字)" style="width: 95%; margin:5px auto;" ></textarea> 
+	<div id="cheer" align="right" style="width: 95%; margin: 5px auto;">
+		<h4 style="display: inline-block; margin: 10px auto; vertical-align: middle;">您是第<b style="color: red; margin: 5px">{{ count }}</b>个为二中高考</h4>
+		<button id="submit" type="submit">加油</button>
+	</div>
+</div>
+{% for item in item_list %}
+	<div class="liuyan" style="margin: 1px auto; padding:5px; visibility: visible;">
+        <p style="font-size: 10px;width: 95%; margin:5px auto;"><b style="font-size: 20px;">{{ item.name }}:</b>&nbsp;&nbsp;&nbsp;&nbsp;{{ item.tel }}</p>
+		<p style="width: 95%; margin:5px auto;">{{ item.comm }}</p>
+		<div class="like" cid="{{ item.cid }}" align="right" style="width: 95%; margin: 5px auto;">
+			<p style="display: inline-block; vertical-align: middle;">已赞 <b id="b{{ item.cid }}" style="color: red;">{{ item.like }}</b></p>
+			<a href="javascript:onClick({{ item.cid }})" id="a{{ item.cid }}" style="display: inline-block; vertical-align: middle;">
+				<img id="i{{ item.cid }}" style="height:20px; width:23px;" src="../static/img/heart.png" />
+			</a>
+		</div>
+	</div>
+    
+    {% ifequal forloop.counter 3 %}
+    <div class="qrcode" style="margin: 1px auto; padding:5px; visibility: visible;">
+		<a id="back" href="http://www.rabbitpre.com/m/Fv6Jfiv" style="width: 100%; text-align: center;">
+        <p id="back_t" style="width:98%; margin: 0px auto;padding:3px; font-size:15px; text-align:center;">戳这里，为二中高考加油接力！</p></a>
+    </div>
+    {% endifequal %}
+
+    {% ifequal forloop.counter 10 %}
+	<div class="qrcode" style="margin: 1px auto; padding:5px; visibility: visible;">
+		<a id="back" href="http://www.rabbitpre.com/m/Fv6Jfiv" style="width: 100%; text-align: center;">
+        <p id="back_t" style="width:98%; margin: 0px auto;padding:3px; font-size:15px; text-align:center;">点击可返回展示页面并分享朋友圈哦</p></a>
+    <p style="width: 95%; margin: 5px auto;"> 可关注以下二维码获取高考动态：</p>
+		<img style="width: 100%;" src="../static/img/qrcode.jpg" />
+    </div>
+	{% endifequal %}
+	
+{% endfor %}
+
+
+
+</body>
+</html>
